@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Clash Royale Deck AI Review</title>
   <style>
     body {
@@ -12,18 +12,8 @@
       color: white;
       text-align: center;
     }
-
-    h1 {
-      margin-top: 30px;
-      font-size: 26px;
-    }
-
-    .container {
-      padding: 20px;
-      max-width: 500px;
-      margin: auto;
-    }
-
+    h1 { margin-top: 30px; font-size: 26px; }
+    .container { padding: 20px; max-width: 500px; margin: auto; }
     .button {
       background-color: #ff6600;
       color: white;
@@ -34,8 +24,7 @@
       border-radius: 10px;
       cursor: pointer;
     }
-
-    select, input {
+    input {
       width: 100%;
       padding: 12px;
       border-radius: 10px;
@@ -43,9 +32,59 @@
       border: none;
       font-size: 16px;
     }
-
-    .deck-slot {
-      background: rgba(255, 255, 255, 0.1);
+    .ratings { margin-top: 20px; }
+    .rating {
+      background: rgba(0, 0, 0, 0.2);
       border-radius: 10px;
-      padding: 15px;
-      ma
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 18px;
+    }
+    .godly {
+      background-image: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+      -webkit-background-clip: text;
+      color: transparent;
+      font-weight: bold;
+      animation: rainbow 4s linear infinite;
+    }
+    @keyframes rainbow {
+      0% { background-position: 0% }
+      100% { background-position: 100% }
+    }
+    footer { margin-top: 30px; font-size: 14px; opacity: 0.7; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Clash Royale Deck AI Review</h1>
+    <input type="text" id="deckInput" placeholder="Paste your deck (e.g. Hog, Fireball, etc.)" />
+    <button class="button" onclick="reviewDeck()">🔍 Review Deck</button>
+    <div class="ratings" id="ratingsContainer"></div>
+    <footer>arenadeckbuilder.com</footer>
+  </div>
+  <script>
+    function randomRating() {
+      const ratings = ["Godly", "Good", "Mid", "Bad"];
+      return ratings[Math.floor(Math.random() * ratings.length)];
+    }
+    function getRatingClass(rating) {
+      return rating === "Godly" ? "godly" : "";
+    }
+    function reviewDeck() {
+      const deck = document.getElementById("deckInput").value.trim();
+      if (!deck) { alert("Please enter a deck!"); return; }
+      const categories = ["Win Condition", "Defense", "Attack", "Counter Attack"];
+      const container = document.getElementById("ratingsContainer");
+      container.innerHTML = "<h2>Deck Review</h2>";
+      categories.forEach(cat => {
+        const rating = randomRating();
+        const className = getRatingClass(rating);
+        container.innerHTML += `
+          <div class="rating">
+            <strong>${cat}:</strong> <span class="${className}">${rating}</span>
+          </div>`;
+      });
+    }
+  </script>
+</body>
+</html>
