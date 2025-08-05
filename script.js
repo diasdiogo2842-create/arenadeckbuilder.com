@@ -1,27 +1,45 @@
-// script.js
-
+// Basic list of all card IDs & names
 const allCards = [
   { id: 26000000, name: "Knight" },
   { id: 26000001, name: "Archers" },
   { id: 26000002, name: "Goblins" },
   { id: 26000003, name: "Giant" },
-  { id: 26000004, name: "P.E.K.K.A" },
-  { id: 26000005, name: "Minions" },
-  // ... add all other cards (up to 27000079+ depending on updates)
+  // ... all others from Fandom/DeckShop lists
 ];
 
-const deckContainer = document.getElementById("deck");
+// Utility: find duplicate costs, high synergy, balance
+function rateDeck(cards) {
+  if (cards.length !== 8) return 0;
+  const costs = cards.map(c => c.elixir);
+  const avg = costs.reduce((a,b)=>(a+b))/8;
+  const varCost = costs.map(c=>Math.abs(c-avg)).reduce((a,b)=>a+b);
+  let duplicates = new Set(cards.map(c=>c.id)).size < 8 ? 0 : 2;
+  let score = Math.round((avg >= 3 && avg <= 4.5 ? 5 : 3) + Math.max(0, 3 - varCost) + duplicates);
+  if (score > 10) score = 10;
+  return score;
+}
 
-allCards.forEach(card => {
-  const cardImg = document.createElement("img");
-  cardImg.src = `cards/${card.id}.png`;
-  cardImg.alt = card.name;
-  cardImg.classList.add("card");
-  cardImg.title = card.name;
+// Parse deck URL like clashroyale://copyDeck?deck=27000010;28000002;...
+function parseDeckLink(url) {
+  const m = url.match(/deck=([^&]+)/);
+  if (!m) return [];
+  const ids = m[1].split(';').map(s=>parseInt(s));
+  return ids.map(id => ({ id, name: (allCards.find(c=>c.id===id)||{}).name || 'Unknown', elixir: Math.floor((id % 8) + 1) }));
+}
 
-  cardImg.addEventListener("click", () => {
-    cardImg.classList.toggle("selected");
+function loadDeck(){
+  const url = document.getElementById('deckLink').value;
+  const parsed = parseDeckLink(url);
+  const container = document.getElementById('deck');
+  container.innerHTML = '';
+  parsed.forEach(c=>{
+    const img = document.createElement('img');
+    img.src = `cards/${c.id}.png`;
+    img.alt = c.name;
+    img.title = c.name + ' (' + c.elixir + ')';
+    img.classList.add('card');
+    container.appendChild(img);
   });
-
-  deckContainer.appendChild(cardImg);
-});
+  const score = rateDeck(parsed);
+  document.getElementById('rating').innerText = `Deck Rating: ${score}/10`;
+}
