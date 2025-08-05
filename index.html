@@ -3,24 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Arena Deck Builder</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <h1>Arena Deck Builder & Review</h1>
+  <title>Clash Royale Deck AI Review</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #5e00a6, #9e42f5);
+      color: white;
+      text-align: center;
+    }
 
-  <form id="deckForm">
-    <input type="text" id="arena" placeholder="Game/Arena Name" required />
-    <input type="text" id="title" placeholder="Deck Title" required />
-    <textarea id="description" placeholder="Deck Description"></textarea>
-    <textarea id="cards" placeholder="Cards (comma separated)"></textarea>
-    <button type="submit">Submit Deck (Local Storage)</button>
-  </form>
+    h1 {
+      margin-top: 30px;
+      font-size: 26px;
+    }
 
-  <section id="decks">
-    <h2>Decks</h2>
-  </section>
+    .container {
+      padding: 20px;
+      max-width: 500px;
+      margin: auto;
+    }
 
-  <script src="script.js"></script>
-</body>
-</html>
+    .button {
+      background-color: #ff6600;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      margin: 10px 0;
+      font-size: 16px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    select, input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      margin: 10px 0;
+      border: none;
+      font-size: 16px;
+    }
+
+    .deck-slot {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 15px;
+      ma
