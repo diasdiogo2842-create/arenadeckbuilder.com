@@ -2,14 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Deck Rater</title>
+  <title>Clash Royale Deck Builder</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Clash Royale Deck Builder</h1>
+  <h1 class="sc-title">Deck Builder & Rater</h1>
+  <input id="deckLink" type="text" placeholder="Paste your Clash Royale deck link" />
+  <button onclick="loadDeck()">Load Deck</button>
   <div id="deck"></div>
-  <button onclick="rateDeck()">Rate Deck</button>
-
+  <div id="rating"></div>
   <script src="script.js"></script>
 </body>
 </html>
