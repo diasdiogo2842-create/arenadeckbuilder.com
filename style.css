@@ -1,1 +1,46 @@
-font-family: 'Luckiest Guy', cursive;
+body {
+  background: linear-gradient(#0a4ea3, #123b7a);
+  font-family: 'Supercell-Magic', sans-serif;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+.card {
+  width: 80px;
+  margin: 10px;
+  border: 3px solid gold;
+  border-radius: 10px;
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: scale(1.1);
+  cursor: pointer;
+}
+
+.card.selected {
+  border: 3px solid limegreen;
+}
+
+#deck {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+button {
+  background-color: #2d88ff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 15px;
+  font-size: 18px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #246edc;
+}
+
