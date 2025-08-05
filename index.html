@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Deck Rater</title>
+  <meta charset="UTF-8">
+  <title>AI Clash Deck Rater</title>
   <style>
     body {
       background-color: #1e1e1e;
@@ -12,43 +11,31 @@
       text-align: center;
       padding: 20px;
     }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-    .section {
-      margin-top: 20px;
-    }
+
     input[type="text"] {
       padding: 10px;
-      width: 60%;
-      background: #2a2a2a;
-      border: none;
-      color: white;
+      width: 80%;
       border-radius: 5px;
+      border: none;
+      background-color: #333;
+      color: white;
     }
+
     button {
       padding: 10px 20px;
-      background-color: #007bff;
-      color: white;
-      border: none;
       margin-top: 10px;
+      background-color: #007bff;
+      border: none;
+      color: white;
       border-radius: 5px;
       cursor: pointer;
     }
-    .ratings {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 20px;
+
+    .result {
       margin-top: 30px;
+      font-size: 1.5em;
     }
-    .rating {
-      background-color: #2f2f2f;
-      padding: 20px;
-      border-radius: 10px;
-      width: 200px;
-    }
+
     .godly {
       font-weight: bold;
       background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
@@ -65,46 +52,96 @@
 </head>
 <body>
   <h1>Deck Check AI</h1>
+  <p>Paste your Clash Royale deck link below:</p>
+  <input id="deckLink" type="text" placeholder="https://link.clashroyale.com/deck/en?deck=..." />
+  <br>
+  <button onclick="rateDeck()">Analyze Deck</button>
 
-  <div class="section">
-    <input type="text" id="deckInput" placeholder="Enter your deck (comma-separated cards)" />
-    <br />
-    <button onclick="analyzeDeck()">Analyze Deck</button>
-  </div>
-
-  <div id="ratings" class="ratings" style="display:none;">
-    <div class="rating" id="win">Win Condition: </div>
-    <div class="rating" id="defense">Defense: </div>
-    <div class="rating" id="attack">Attack: </div>
-    <div class="rating" id="counter">Counter Attack: </div>
-  </div>
+  <div class="result" id="resultText"></div>
 
   <script>
-    function randomGrade() {
-      const grades = ['Bad', 'Mid', 'Good', 'Godly'];
-      return grades[Math.floor(Math.random() * grades.length)];
+    const cardMap = {
+      "26000000": "Knight",
+      "26000001": "Archers",
+      "26000002": "Goblins",
+      "26000003": "Giant",
+      "26000004": "P.E.K.K.A",
+      "26000005": "Minions",
+      "26000006": "Balloon",
+      "26000007": "Witch",
+      "26000008": "Barbarians",
+      "26000009": "Golem",
+      "26000010": "Skeletons",
+      // add more card IDs as needed
+    };
+
+    const metaDecks = [
+      ["Knight", "Archers", "Goblins", "Giant", "Minions", "Fireball", "Zap", "Cannon"],
+      ["P.E.K.K.A", "Wizard", "Baby Dragon", "Tornado", "Miner", "Poison", "Bandit", "Electro Wizard"],
+      ["Golem", "Night Witch", "Mega Minion", "Lightning", "Tornado", "Baby Dragon", "Dark Prince", "Lumberjack"]
+    ];
+
+    const counterMap = {
+      "Golem": ["P.E.K.K.A", "Inferno Tower", "Mini P.E.K.K.A"],
+      "Balloon": ["Musketeer", "Minions", "Electro Dragon"],
+      "Hog Rider": ["Tornado", "Cannon", "Mini P.E.K.K.A"],
+      "Witch": ["Poison", "Fireball", "Dark Prince"],
+      "Giant": ["Inferno Tower", "Mini P.E.K.K.A", "P.E.K.K.A"],
+      // Add more counters as needed
+    };
+
+    function extractCardIDs(link) {
+      const match = link.match(/deck=([\d;]+)/);
+      if (!match) return [];
+      return match[1].split(";");
     }
 
-    function getStyledGrade(grade) {
-      if (grade === 'Godly') {
-        return `<span class="godly">${grade}</span>`;
+    function getCardNames(cardIDs) {
+      return cardIDs.map(id => cardMap[id]).filter(Boolean);
+    }
+
+    function countMetaCounters(userDeck) {
+      let counteredDecks = 0;
+      for (let deck of metaDecks) {
+        let beaten = false;
+        for (let metaCard of deck) {
+          if (counterMap[metaCard]) {
+            const counters = counterMap[metaCard];
+            if (userDeck.some(card => counters.includes(card))) {
+              beaten = true;
+              break;
+            }
+          }
+        }
+        if (beaten) counteredDecks++;
       }
-      return grade;
+      return counteredDecks;
     }
 
-    function analyzeDeck() {
-      const ratings = {
-        win: randomGrade(),
-        defense: randomGrade(),
-        attack: randomGrade(),
-        counter: randomGrade()
-      };
+    function rateDeck() {
+      const link = document.getElementById("deckLink").value.trim();
+      const ids = extractCardIDs(link);
+      const cardNames = getCardNames(ids);
 
-      document.getElementById('ratings').style.display = 'flex';
-      document.getElementById('win').innerHTML = `Win Condition: ${getStyledGrade(ratings.win)}`;
-      document.getElementById('defense').innerHTML = `Defense: ${getStyledGrade(ratings.defense)}`;
-      document.getElementById('attack').innerHTML = `Attack: ${getStyledGrade(ratings.attack)}`;
-      document.getElementById('counter').innerHTML = `Counter Attack: ${getStyledGrade(ratings.counter)}`;
+      if (cardNames.length === 0) {
+        document.getElementById("resultText").textContent = "Invalid link or unsupported cards.";
+        return;
+      }
+
+      const beatCount = countMetaCounters(cardNames);
+
+      let resultText = "";
+      if (beatCount >= 3) {
+        resultText = '<span class="godly">Rating: GODLY</span>';
+      } else if (beatCount === 2) {
+        resultText = "Rating: Good";
+      } else if (beatCount === 1) {
+        resultText = "Rating: Mid";
+      } else {
+        resultText = "Rating: Bad";
+      }
+
+      document.getElementById("resultText").innerHTML = resultText;
     }
   </script>
 </body>
