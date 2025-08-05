@@ -13,7 +13,6 @@ document.getElementById('deckForm').addEventListener('submit', (e) => {
     cards: cards.split(',').map(c => c.trim())
   };
 
-  // Store temporarily in localStorage
   const decks = JSON.parse(localStorage.getItem('decks') || '[]');
   decks.push(deck);
   localStorage.setItem('decks', JSON.stringify(decks));
