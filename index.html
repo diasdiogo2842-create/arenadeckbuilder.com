@@ -11,7 +11,6 @@
       text-align: center;
       padding: 20px;
     }
-
     input[type="text"] {
       padding: 10px;
       width: 80%;
@@ -20,7 +19,6 @@
       background-color: #333;
       color: white;
     }
-
     button {
       padding: 10px 20px;
       margin-top: 10px;
@@ -30,12 +28,13 @@
       border-radius: 5px;
       cursor: pointer;
     }
-
     .result {
       margin-top: 30px;
-      font-size: 1.5em;
+      font-size: 1.2em;
     }
-
+    .category {
+      margin-bottom: 10px;
+    }
     .godly {
       font-weight: bold;
       background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
@@ -43,10 +42,13 @@
       -webkit-text-fill-color: transparent;
       animation: rainbow 4s linear infinite;
     }
-
     @keyframes rainbow {
       0% {filter: hue-rotate(0deg);}
       100% {filter: hue-rotate(360deg);}
+    }
+    .suggestion {
+      margin-top: 20px;
+      color: #ff7777;
     }
   </style>
 </head>
@@ -58,6 +60,7 @@
   <button onclick="rateDeck()">Analyze Deck</button>
 
   <div class="result" id="resultText"></div>
+  <div class="suggestion" id="swapSuggestions"></div>
 
   <script>
     const cardMap = {
@@ -72,22 +75,22 @@
       "26000008": "Barbarians",
       "26000009": "Golem",
       "26000010": "Skeletons",
-      // add more card IDs as needed
+      "26000011": "Valkyrie",
+      "26000012": "Mini P.E.K.K.A",
+      "26000013": "Musketeer",
+      "26000014": "Baby Dragon",
+      "26000015": "Prince",
+      "26000016": "Wizard"
     };
 
-    const metaDecks = [
-      ["Knight", "Archers", "Goblins", "Giant", "Minions", "Fireball", "Zap", "Cannon"],
-      ["P.E.K.K.A", "Wizard", "Baby Dragon", "Tornado", "Miner", "Poison", "Bandit", "Electro Wizard"],
-      ["Golem", "Night Witch", "Mega Minion", "Lightning", "Tornado", "Baby Dragon", "Dark Prince", "Lumberjack"]
-    ];
+    const offenseCards = ["Giant", "Balloon", "Golem", "P.E.K.K.A", "Hog Rider", "Miner", "Royal Giant", "Prince"];
+    const defenseCards = ["Cannon", "Tornado", "Mini P.E.K.K.A", "Knight", "Valkyrie", "Archers", "Musketeer"];
+    const winConditions = ["Golem", "Hog Rider", "Balloon", "Royal Giant", "X-Bow", "Mortar", "Miner", "Graveyard"];
 
-    const counterMap = {
-      "Golem": ["P.E.K.K.A", "Inferno Tower", "Mini P.E.K.K.A"],
-      "Balloon": ["Musketeer", "Minions", "Electro Dragon"],
-      "Hog Rider": ["Tornado", "Cannon", "Mini P.E.K.K.A"],
-      "Witch": ["Poison", "Fireball", "Dark Prince"],
-      "Giant": ["Inferno Tower", "Mini P.E.K.K.A", "P.E.K.K.A"],
-      // Add more counters as needed
+    const suggestions = {
+      offense: ["Prince", "Giant", "Balloon", "Hog Rider"],
+      defense: ["Mini P.E.K.K.A", "Valkyrie", "Musketeer", "Cannon"],
+      win: ["Hog Rider", "Miner", "Golem", "Royal Giant"]
     };
 
     function extractCardIDs(link) {
@@ -100,48 +103,64 @@
       return cardIDs.map(id => cardMap[id]).filter(Boolean);
     }
 
-    function countMetaCounters(userDeck) {
-      let counteredDecks = 0;
-      for (let deck of metaDecks) {
-        let beaten = false;
-        for (let metaCard of deck) {
-          if (counterMap[metaCard]) {
-            const counters = counterMap[metaCard];
-            if (userDeck.some(card => counters.includes(card))) {
-              beaten = true;
-              break;
-            }
-          }
-        }
-        if (beaten) counteredDecks++;
+    function scoreCategory(deck, categoryList) {
+      let score = deck.filter(card => categoryList.includes(card)).length;
+      if (score >= 3) return "Godly";
+      if (score === 2) return "Good";
+      if (score === 1) return "Mid";
+      return "Bad";
+    }
+
+    function getStyledGrade(grade) {
+      if (grade === "Godly") {
+        return `<span class="godly">${grade}</span>`;
       }
-      return counteredDecks;
+      return grade;
+    }
+
+    function suggestSwaps(deck, category, categoryList) {
+      let present = deck.filter(card => categoryList.includes(card));
+      if (present.length >= 2) return null;
+
+      const needed = suggestions[category].filter(card => !deck.includes(card));
+      return needed.slice(0, 2); // Suggest top 2
     }
 
     function rateDeck() {
       const link = document.getElementById("deckLink").value.trim();
       const ids = extractCardIDs(link);
-      const cardNames = getCardNames(ids);
+      const deck = getCardNames(ids);
 
-      if (cardNames.length === 0) {
-        document.getElementById("resultText").textContent = "Invalid link or unsupported cards.";
+      if (deck.length !== 8) {
+        document.getElementById("resultText").innerHTML = "Invalid deck link or unsupported cards.";
         return;
       }
 
-      const beatCount = countMetaCounters(cardNames);
+      const offense = scoreCategory(deck, offenseCards);
+      const defense = scoreCategory(deck, defenseCards);
+      const wincon = scoreCategory(deck, winConditions);
 
-      let resultText = "";
-      if (beatCount >= 3) {
-        resultText = '<span class="godly">Rating: GODLY</span>';
-      } else if (beatCount === 2) {
-        resultText = "Rating: Good";
-      } else if (beatCount === 1) {
-        resultText = "Rating: Mid";
+      document.getElementById("resultText").innerHTML = `
+        <div class="category">Offense: ${getStyledGrade(offense)}</div>
+        <div class="category">Defense: ${getStyledGrade(defense)}</div>
+        <div class="category">Win Condition: ${getStyledGrade(wincon)}</div>
+      `;
+
+      let suggestionText = "";
+      const offenseSwap = suggestSwaps(deck, "offense", offenseCards);
+      const defenseSwap = suggestSwaps(deck, "defense", defenseCards);
+      const winSwap = suggestSwaps(deck, "win", winConditions);
+
+      if (offenseSwap || defenseSwap || winSwap) {
+        suggestionText += "<b>Suggested Improvements:</b><br>";
+        if (offenseSwap) suggestionText += `🔁 Add for Offense: ${offenseSwap.join(", ")}<br>`;
+        if (defenseSwap) suggestionText += `🛡️ Add for Defense: ${defenseSwap.join(", ")}<br>`;
+        if (winSwap) suggestionText += `🏆 Add for Win Condition: ${winSwap.join(", ")}`;
       } else {
-        resultText = "Rating: Bad";
+        suggestionText = "✅ This deck is well-balanced!";
       }
 
-      document.getElementById("resultText").innerHTML = resultText;
+      document.getElementById("swapSuggestions").innerHTML = suggestionText;
     }
   </script>
 </body>
