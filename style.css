@@ -1,38 +1,16 @@
-@font-face {
-  font-family: 'SupercellMagic';
-  src: url('fonts/YouBlockhead.ttf') format('truetype');
-}
 body {
-  background: linear-gradient(#0a4ea3, #123b7a);
-  font-family: 'SupercellMagic', sans-serif;
-  color: white;
+  margin: 0;
+  padding: 0;
+  font-family: 'Luckiest Guy', cursive;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  background-size: 400% 400%;
+  animation: animatedGradient 15s ease infinite;
+  color: #fff;
   text-align: center;
-  padding: 20px;
 }
-.sc-title {
-  font-size: 36px;
-  color: #ffcc00;
-  text-shadow: 2px 2px #000;
-  margin-bottom: 20px;
+
+@keyframes animatedGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
-input {
-  width: 60%;
-  padding: 10px;
-  margin: 10px auto;
-  border-radius: 10px;
-  border: none;
-  font-size: 16px;
-}
-button {
-  background-color: #2d88ff;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 15px;
-  font-size: 18px;
-  cursor: pointer;
-}
-#deck { margin-top: 20px; display: flex; flex-wrap: wrap; justify-content: center; }
-.card { width: 80px; margin: 5px; border: 2px solid gold; border-radius: 8px; cursor: pointer; }
-.card.selected { border-color: limegreen; }
-#rating { margin-top: 20px; font-size: 24px; }
